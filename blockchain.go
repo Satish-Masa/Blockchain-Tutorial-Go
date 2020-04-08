@@ -11,6 +11,11 @@ type Blockchain struct {
 	db  *bolt.DB
 }
 
+type BlockchainIterator struct {
+	currentHash []byte
+	db          *bolt.DB
+}
+
 // AddBlock saves provided data as a block in the blockchain
 func (bc *Blockchain) AddBlock(data string) {
 	var lastHash []byte
@@ -58,4 +63,24 @@ func NewBlockchain() *Blockchain {
 	bc := Blockchain{tip, db}
 
 	return &bc
+}
+
+func (bc *Blockchain) Iterator() *BlockchainIterator {
+	return &BlockchainIterator{bc.tip, bc.db}
+}
+
+func (i *BlockchainIterator) Next() *Block {
+	var block *Block
+
+	err := i.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(blocksBucket))
+		encodedBlock := b.Get(i.currentHash)
+		block = DeserializeBlock(encodedBlock)
+
+		return nil
+	})
+
+	i.currentHash = block.PrevBlockHash
+
+	return nil
 }
