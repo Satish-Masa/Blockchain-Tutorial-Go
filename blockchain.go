@@ -202,6 +202,7 @@ func (bc *Blockchain) FindUnspentTransactions(address string) []Transaction {
 	return unspentTXs
 }
 
+// FindSpendableOutputs finds and returns unspent outputs to reference in inputs
 func (bc *Blockchain) FindSpendableOutputs(address string, amount int) (int, map[string][]int) {
 	unspentOutputs := make(map[string][]int)
 	unspentTXs := bc.FindUnspentTransactions(address)

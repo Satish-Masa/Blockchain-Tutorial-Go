@@ -49,6 +49,7 @@ func (tx *Transaction) SetID() {
 }
 
 // NewCoinbaseTX creats a new coinbase transaction.
+// coinbase is a bitcoin transaction that the miner gets as a reward for generating a new block by mining.
 func NewCoinbaseTX(to, data string) *Transaction {
 	if data == "" {
 		data = fmt.Sprintf("Reword to %s", to)
@@ -70,6 +71,7 @@ func (out *TXOutput) CanBeUnlockedWith(unlockingData string) bool {
 	return out.ScriptPubKey == unlockingData
 }
 
+// NewUTXOTransaction creates a new transaction
 func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transaction {
 	var inputs []TXInput
 	var outputs []TXOutput
