@@ -1,12 +1,7 @@
 package main
 
-import (
-	"fmt"
-	"log"
-)
-
 func (cli *CLI) listAddresses() {
-	wallets, err := NewWallets()
+	/* wallets, err := NewWallets()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -14,5 +9,5 @@ func (cli *CLI) listAddresses() {
 
 	for _, address := range addresses {
 		fmt.Println(address)
-	}
+	} */
 }

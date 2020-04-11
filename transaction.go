@@ -188,11 +188,11 @@ func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transactio
 	var inputs []TXInput
 	var outputs []TXOutput
 
-	wallets, err := NewWallets()
+	/* wallets, err := NewWallets()
 	if err != nil {
 		log.Panic(err)
-	}
-	wallet := wallets.GetWallet(from)
+	} */
+	wallet := NewWallet()
 	pubKeyHash := HashPubKey(wallet.PublicKey)
 	acc, validOutputs := bc.FindSpendableOutputs(pubKeyHash, amount)
 

@@ -100,9 +100,9 @@ func (cli *CLI) Run() {
 		cli.createWallet()
 	}
 
-	if listAddressesCmd.Parsed() {
+	/* if listAddressesCmd.Parsed() {
 		cli.listAddresses()
-	}
+	} */
 
 	if printChainCmd.Parsed() {
 		cli.printChain()

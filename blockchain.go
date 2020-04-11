@@ -14,7 +14,7 @@ import (
 
 const dbFile = "blockchain.db"
 const blocksBucket = "blocks"
-const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
+const genesisCoinbaseData = "The Times 11/Apr/2020 I will go to the university!!"
 
 // Blockchain implements interactions with a DB
 type Blockchain struct {

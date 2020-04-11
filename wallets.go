@@ -1,21 +1,17 @@
 package main
 
 import (
-	"bytes"
-	"crypto/elliptic"
-	"encoding/gob"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
 )
+
+const walletFile = "walletFile.txt"
 
 // Wallets stores a collection of wallets
 type Wallets struct {
 	Wallets map[string]*Wallet
 }
 
-// NewWallets creates Wallets and fills it from a file if it exists
+/* // NewWallets creates Wallets and fills it from a file if it exists
 func NewWallets() (*Wallets, error) {
 	wallets := Wallets{}
 	wallets.Wallets = make(map[string]*Wallet)
@@ -23,9 +19,9 @@ func NewWallets() (*Wallets, error) {
 	err := wallets.LoadFromFile()
 
 	return &wallets, err
-}
+} */
 
-// LoadFromFile loads wallets from the file
+/* // LoadFromFile loads wallets from the file
 func (ws *Wallets) LoadFromFile() error {
 	if _, err := os.Stat(walletFile); os.IsNotExist(err) {
 		return err
@@ -47,7 +43,7 @@ func (ws *Wallets) LoadFromFile() error {
 	ws.Wallets = wallets.Wallets
 
 	return nil
-}
+} */
 
 // CreateWallet adds a Wallet to Wallets
 func (ws *Wallets) CreateWallet() string {
@@ -75,7 +71,7 @@ func (ws Wallets) GetWallet(address string) Wallet {
 	return *ws.Wallets[address]
 }
 
-// SaveToFile saves wallets to a file
+/* // SaveToFile saves wallets to a file
 func (ws Wallets) SaveToFile() {
 	var content bytes.Buffer
 
@@ -91,4 +87,4 @@ func (ws Wallets) SaveToFile() {
 	if err != nil {
 		log.Panic(err)
 	}
-}
+} */
