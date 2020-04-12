@@ -188,19 +188,15 @@ func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transactio
 	var inputs []TXInput
 	var outputs []TXOutput
 
-	/* wallets, err := NewWallets()
-	if err != nil {
-		log.Panic(err)
-	} */
-	wallet := NewWallet()
-	pubKeyHash := HashPubKey(wallet.PublicKey)
+	pubKeyHash := Base58Decode([]byte(from))
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-4]
+
 	acc, validOutputs := bc.FindSpendableOutputs(pubKeyHash, amount)
 
 	if acc < amount {
 		log.Panic("ERROR: Not enough funds")
 	}
 
-	// Build a list of inputs
 	for txid, outs := range validOutputs {
 		txID, err := hex.DecodeString(txid)
 		if err != nil {
@@ -208,12 +204,11 @@ func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transactio
 		}
 
 		for _, out := range outs {
-			input := TXInput{txID, out, nil, wallet.PublicKey}
+			input := TXInput{txID, out, nil, pubKeyHash}
 			inputs = append(inputs, input)
 		}
 	}
 
-	// Build a list of outputs
 	outputs = append(outputs, *NewTXOutput(amount, to))
 	if acc > amount {
 		outputs = append(outputs, *NewTXOutput(acc-amount, from)) // a change
@@ -221,7 +216,7 @@ func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transactio
 
 	tx := Transaction{nil, inputs, outputs}
 	tx.ID = tx.Hash()
-	bc.SignTransaction(&tx, wallet.PrivateKey)
+	// bc.SignTransaction(&tx, wallet.PrivateKey)
 
 	return &tx
 }

@@ -14,7 +14,7 @@ import (
 
 const dbFile = "blockchain.db"
 const blocksBucket = "blocks"
-const genesisCoinbaseData = "The Times 11/Apr/2020 I will go to the university!!"
+const genesisCoinbaseData = "The Times 10/Apr/2020 Students whose studies have been postponed"
 
 // Blockchain implements interactions with a DB
 type Blockchain struct {
@@ -155,7 +155,6 @@ func (bc *Blockchain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 
 		Outputs:
 			for outIdx, out := range tx.Vout {
-				// Was the output spent?
 				if spentTXOs[txID] != nil {
 					for _, spentOutIdx := range spentTXOs[txID] {
 						if spentOutIdx == outIdx {
@@ -210,15 +209,9 @@ func (bc *Blockchain) Iterator() *BlockchainIterator {
 	return bci
 }
 
-// MineBlock mines a new block with the provided transactions
-func (bc *Blockchain) MineBlock(transactions []*Transaction) {
+// AddBlock saves provided data as a block in the blockchain
+func (bc *Blockchain) AddBlock(transaction []*Transaction) {
 	var lastHash []byte
-
-	for _, tx := range transactions {
-		if bc.VerifyTransaction(tx) != true {
-			log.Panic("ERROR: Invalid transaction")
-		}
-	}
 
 	err := bc.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
@@ -226,11 +219,12 @@ func (bc *Blockchain) MineBlock(transactions []*Transaction) {
 
 		return nil
 	})
+
 	if err != nil {
 		log.Panic(err)
 	}
 
-	newBlock := NewBlock(transactions, lastHash)
+	newBlock := NewBlock(transaction, lastHash)
 
 	err = bc.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
@@ -248,9 +242,6 @@ func (bc *Blockchain) MineBlock(transactions []*Transaction) {
 
 		return nil
 	})
-	if err != nil {
-		log.Panic(err)
-	}
 }
 
 // SignTransaction signs inputs of a Transaction
