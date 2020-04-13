@@ -13,11 +13,16 @@ type CLI struct {
 }
 
 func (cli *CLI) getBalance(address string) {
+	if !ValidateAddress(address) {
+		log.Panic("ERROR: Address is not valid")
+	}
 	bc := NewBlockchain(address)
 	defer bc.db.Close()
 
 	balance := 0
-	UTXOs := bc.FindUTXO(address)
+	pubKeyHash := Base58Decode([]byte(address))
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-4]
+	UTXOs := bc.FindUTXO(pubKeyHash)
 
 	for _, out := range UTXOs {
 		balance += out.Value
@@ -70,7 +75,7 @@ func (cli *CLI) send(from, to string, amount int) {
 	defer bc.db.Close()
 
 	tx := NewUTXOTransaction(from, to, amount, bc)
-	bc.AddBlock([]*Transaction{tx})
+	bc.MineBlock([]*Transaction{tx})
 	fmt.Println("Success!!")
 }
 
@@ -137,8 +142,9 @@ func (cli *CLI) Run() {
 	}
 
 	if createWalletCmd.Parsed() {
-		wallet := NewWallet()
-		address := wallet.GetAddress()
+		wallets, _ := NewWallets()
+		address := wallets.CreateWallet()
+		wallets.SaveToFile()
 
 		fmt.Printf("Your new address: %s\n", address)
 	}
