@@ -209,9 +209,15 @@ func (bc *Blockchain) Iterator() *BlockchainIterator {
 	return bci
 }
 
-// AddBlock saves provided data as a block in the blockchain
-func (bc *Blockchain) AddBlock(transaction []*Transaction) {
+// MineBlock mines a new block with the provided transactions
+func (bc *Blockchain) MineBlock(transactions []*Transaction) {
 	var lastHash []byte
+
+	for _, tx := range transactions {
+		if bc.VerifyTransaction(tx) != true {
+			log.Panic("ERROR: Invalid transaction")
+		}
+	}
 
 	err := bc.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
@@ -224,7 +230,7 @@ func (bc *Blockchain) AddBlock(transaction []*Transaction) {
 		log.Panic(err)
 	}
 
-	newBlock := NewBlock(transaction, lastHash)
+	newBlock := NewBlock(transactions, lastHash)
 
 	err = bc.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
