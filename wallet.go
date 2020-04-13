@@ -10,6 +10,10 @@ import (
 	"golang.org/x/crypto/ripemd160"
 )
 
+const version = byte(0x00)
+const walletFile = "wallet.dat"
+const addressChecksumLen = 3
+
 type Wallet struct {
 	PrivateKey ecdsa.PrivateKey
 	PublicKey  []byte
@@ -60,4 +64,11 @@ func HashPubKey(pubKey []byte) []byte {
 	publicRIPEMD160 := RIPEMD160Hasher.Sum(nil)
 
 	return publicRIPEMD160
+}
+
+func checksum(payload []byte) []byte {
+	firstSHA := sha256.Sum256(payload)
+	secondSHA := sha256.Sum256(firstSHA[:])
+
+	return secondSHA[:addressChecksumLen]
 }
