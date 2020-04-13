@@ -13,11 +13,16 @@ type CLI struct {
 }
 
 func (cli *CLI) getBalance(address string) {
+	if !ValidateAddress(address) {
+		log.Panic("ERROR: Address is not valid")
+	}
 	bc := NewBlockchain(address)
 	defer bc.db.Close()
 
 	balance := 0
-	UTXOs := bc.FindUTXO(address)
+	pubKeyHash := Base58Decode([]byte(address))
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-4]
+	UTXOs := bc.FindUTXO(pubKeyHash)
 
 	for _, out := range UTXOs {
 		balance += out.Value
@@ -70,7 +75,7 @@ func (cli *CLI) send(from, to string, amount int) {
 	defer bc.db.Close()
 
 	tx := NewUTXOTransaction(from, to, amount, bc)
-	bc.AddBlock([]*Transaction{tx})
+	bc.MineBlock([]*Transaction{tx})
 	fmt.Println("Success!!")
 }
 
@@ -79,6 +84,7 @@ func (cli *CLI) Run() {
 
 	getBalanceCmd := flag.NewFlagSet("getbalance", flag.ExitOnError)
 	createBlockchainCmd := flag.NewFlagSet("createblockchain", flag.ExitOnError)
+	createWalletCmd := flag.NewFlagSet("createwallet", flag.ExitOnError)
 	sendCmd := flag.NewFlagSet("send", flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet("printchain", flag.ExitOnError)
 
@@ -96,6 +102,11 @@ func (cli *CLI) Run() {
 		}
 	case "createblockchain":
 		err := createBlockchainCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "createwallet":
+		err := createWalletCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -128,6 +139,14 @@ func (cli *CLI) Run() {
 			os.Exit(1)
 		}
 		cli.addBlock(*createBlockchainAddress)
+	}
+
+	if createWalletCmd.Parsed() {
+		wallets, _ := NewWallets()
+		address := wallets.CreateWallet()
+		wallets.SaveToFile()
+
+		fmt.Printf("Your new address: %s\n", address)
 	}
 
 	if printChainCmd.Parsed() {
